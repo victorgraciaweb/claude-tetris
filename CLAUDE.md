@@ -13,11 +13,6 @@ python3 -m http.server 8000     # o servidor estático
 
 ## Arquitectura
 
-Todo el juego vive en `game.js` como funciones de nivel superior sobre variables globales del módulo (`board`, `current`, `next`, `score`, `lines`, `level`, `paused`, `gameOver`, `dropInterval`, `dropAccum`, `animId`). No hay clases ni módulos ES.
-
-- `init()` es a la vez arranque y reinicio: resetea todo el estado, cancela el `animId` anterior y relanza el loop. El botón de reinicio llama directamente a `init`.
-- `loop(ts)` (`requestAnimationFrame`) acumula `dt` en `dropAccum` y baja una fila cuando supera `dropInterval`; dibuja en cada frame.
-- `board` es matriz `ROWS × COLS` de enteros: `0` = vacío, `1..N` = índice de pieza, que es también el índice en `COLORS`.
 - Pausa/game over cancelan el `rAF`; despausar reinicia `lastTime` antes de volver a `loop` para no acumular un `dt` gigante.
 
 ## Invariantes al modificar
