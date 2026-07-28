@@ -25,7 +25,9 @@ Todo el juego vive en `game.js` como funciones de nivel superior sobre variables
 **Añadir o quitar una pieza requiere 3 ediciones coordinadas** (`game.js`):
 1. Entrada en `COLORS` en la misma posición del array.
 2. Entrada en `PIECES` cuya matriz se rellena con ese mismo índice (la pieza `+` usa `8` en todas sus celdas porque es la posición 8).
-3. El literal en `randomPiece()`: `Math.random() * 8` — hay que actualizar el `8` al nuevo número de piezas. Es la fuente de errores más fácil de olvidar.
+3. El literal en `randomPiece()`: `Math.random() * 9` — hay que actualizar el `9` al nuevo número de piezas. Es la fuente de errores más fácil de olvidar.
+
+Hay 9 piezas: las 7 estándar (I, O, T, S, Z, J, L) más `+` (8) y `L larga` (9).
 
 **Las dimensiones del canvas están duplicadas en HTML.** `<canvas id="board" width="300" height="600">` debe ser `COLS * BLOCK` × `ROWS * BLOCK`. Si se cambian `COLS`, `ROWS` o `BLOCK`, hay que editar `index.html` también.
 
