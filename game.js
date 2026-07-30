@@ -43,8 +43,25 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeToggleBtn = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+
+function applyTheme(theme) {
+  document.body.classList.toggle('light', theme === 'light');
+  themeToggleBtn.textContent = theme === 'light' ? '☀️' : '🌙';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  applyTheme(saved === 'light' ? 'light' : 'dark');
+}
+
+themeToggleBtn.addEventListener('click', () => {
+  const theme = document.body.classList.contains('light') ? 'dark' : 'light';
+  applyTheme(theme);
+  localStorage.setItem('theme', theme);
+});
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -305,4 +322,5 @@ document.addEventListener('keydown', e => {
 
 restartBtn.addEventListener('click', init);
 
+initTheme();
 init();
