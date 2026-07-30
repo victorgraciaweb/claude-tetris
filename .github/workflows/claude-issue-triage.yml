@@ -1,0 +1,45 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Analyze issue and assign labels
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Analiza el issue #${{ github.event.issue.number }} de este repositorio (título y cuerpo).
+
+            1. Determina qué tipo de tarea es y asigna las labels existentes del repositorio que
+               correspondan con `gh issue edit ${{ github.event.issue.number }} --add-label "<label>"`.
+               Labels existentes: bug, documentation, duplicate, enhancement, good first issue,
+               help wanted, invalid, question, wontfix.
+            2. Si el issue trata un área o prioridad que ninguna label existente cubre y crees que
+               aporta valor para el triage, crea una label nueva con `gh label create "<label>"
+               --color <hex> --description "<desc>"` (color coherente con el resto) y asígnala.
+            3. Publica un comentario en el issue con
+               `gh issue comment ${{ github.event.issue.number }} --body "..."` que incluya un
+               diagnóstico breve: qué se pide, qué archivo(s) de este proyecto (game.js, index.html,
+               style.css) probablemente haya que tocar, y qué invariantes de CLAUDE.md aplican (por
+               ejemplo las 3 ediciones coordinadas al añadir/quitar una pieza, las dimensiones del
+               canvas duplicadas en index.html, o el ajuste de `r++` en `clearLines()`).
+
+            No implementes la solución ni edites código del proyecto, solo etiqueta y comenta el
+            diagnóstico.
+          claude_args: |
+            --allowed-tools "Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label create:*),Bash(gh label list:*)"
