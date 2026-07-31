@@ -32,6 +32,10 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+const RAYO_TRIGGER_LINES = 3;
+const RAYO_BONUS_SCORE = 500;
+const RAYO_FLASH_MS = 400;
+
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
@@ -45,7 +49,7 @@ const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId, rayoFlash, rayoProgress;
 
 function applyTheme(theme) {
   document.body.classList.toggle('light', theme === 'light');
@@ -130,7 +134,30 @@ function clearLines() {
     level = Math.floor(lines / 10) + 1;
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
     updateHUD();
+    rayoProgress += cleared;
+    if (rayoProgress >= RAYO_TRIGGER_LINES) {
+      rayoProgress -= RAYO_TRIGGER_LINES;
+      triggerRayo();
+      updateHUD();
+    }
   }
+}
+
+function triggerRayo() {
+  const rows = [];
+  for (let r = 0; r < ROWS; r++) if (board[r].some(v => v !== 0)) rows.push(r);
+  const cols = [];
+  for (let c = 0; c < COLS; c++) if (board.some(row => row[c] !== 0)) cols.push(c);
+  if (!rows.length || !cols.length) return;
+
+  const row = rows[Math.floor(Math.random() * rows.length)];
+  const col = cols[Math.floor(Math.random() * cols.length)];
+
+  board[row].fill(0);
+  for (let r = 0; r < ROWS; r++) board[r][col] = 0;
+
+  score += RAYO_BONUS_SCORE * level;
+  rayoFlash = { row, col, until: performance.now() + RAYO_FLASH_MS };
 }
 
 function ghostY() {
@@ -226,6 +253,21 @@ function draw() {
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+
+  drawRayoFlash();
+}
+
+function drawRayoFlash() {
+  if (!rayoFlash) return;
+  const remaining = rayoFlash.until - performance.now();
+  if (remaining <= 0) {
+    rayoFlash = null;
+    return;
+  }
+  const alpha = 0.35 + 0.35 * (remaining / RAYO_FLASH_MS);
+  ctx.fillStyle = `rgba(255, 235, 59, ${alpha})`;
+  ctx.fillRect(0, rayoFlash.row * BLOCK, COLS * BLOCK, BLOCK);
+  ctx.fillRect(rayoFlash.col * BLOCK, 0, BLOCK, ROWS * BLOCK);
 }
 
 function drawNext() {
@@ -287,6 +329,8 @@ function init() {
   gameOver = false;
   dropInterval = 1000;
   dropAccum = 0;
+  rayoFlash = null;
+  rayoProgress = 0;
   lastTime = performance.now();
   next = randomPiece();
   spawn();
