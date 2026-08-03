@@ -184,9 +184,6 @@ kbd {
   border-radius: 4px;
 }
 
-.overlay.hidden {
-  display: none;
-}
 
 .overlay-box {
   text-align: center;
@@ -209,8 +206,8 @@ kbd {
   color: var(--overlay-score-color);
 }
 
-#restart-btn {
-  margin-top: 8px;
+/* ---- Botones ---- */
+.btn {
   background: var(--btn-bg);
   color: var(--btn-color);
   border: none;
@@ -223,6 +220,121 @@ kbd {
   transition: background 0.15s;
 }
 
-#restart-btn:hover {
+.btn:hover {
   background: var(--btn-hover-bg);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--label-color);
+  border: 1px solid var(--board-border);
+}
+
+.btn-secondary:hover {
+  background: var(--kbd-bg);
+  color: var(--text);
+}
+
+#restart-btn {
+  margin-top: 8px;
+}
+
+/* ---- Pantalla de inicio y puntuaciones ---- */
+.start-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: var(--title-color);
+}
+
+.start-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.start-stats .panel-section {
+  align-items: center;
+}
+
+.highscores-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.highscores-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  min-width: 220px;
+}
+
+.highscores-list li {
+  display: flex;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: var(--text);
+}
+
+.hs-rank {
+  color: var(--label-color);
+  width: 16px;
+}
+
+.hs-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.hs-score {
+  text-align: right;
+}
+
+.highscores-list li.current-score {
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  font-weight: 700;
+}
+
+.name-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#player-name-input {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  background: var(--board-bg);
+  color: var(--text);
+  border: 1px solid var(--board-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  width: 120px;
+}
+
+#player-name-input:focus {
+  outline: none;
+  border-color: var(--btn-bg);
+}
+
+#save-score-btn {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+/* ---- Utilidad genérica de visibilidad ---- */
+/* Debe ir al final de la hoja: misma especificidad (una clase) que
+   .overlay/.name-form (display: flex), gana por orden de cascada. */
+.hidden {
+  display: none;
 }
