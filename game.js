@@ -80,7 +80,16 @@ const playerNameInput = document.getElementById('player-name-input');
 const saveScoreBtn = document.getElementById('save-score-btn');
 const gameoverHighscoresList = document.getElementById('gameover-highscores-list');
 
-let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId, rayoFlash, rayoProgress, comboCount, bestCombo;
+const pauseOverlay = document.getElementById('pause-overlay');
+const resumeBtn = document.getElementById('resume-btn');
+const restartPauseBtn = document.getElementById('restart-pause-btn');
+const controlsBtn = document.getElementById('controls-btn');
+const backToPauseBtn = document.getElementById('back-to-pause-btn');
+const pauseMain = document.getElementById('pause-main');
+const pauseControls = document.getElementById('pause-controls');
+const startLevelSelect = document.getElementById('start-level-select');
+
+let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId, rayoFlash, rayoProgress, comboCount, bestCombo, selectedStartLevel;
 let currentSkin = 'retro';
 let pendingScoreToSave = null;
 
@@ -213,6 +222,17 @@ saveScoreBtn.addEventListener('click', () => {
 
 playerNameInput.addEventListener('keydown', e => {
   if (e.code === 'Enter') saveScoreBtn.click();
+});
+
+function initStartLevel() {
+  const saved = parseInt(localStorage.getItem('startLevel'), 10);
+  selectedStartLevel = Number.isInteger(saved) && saved >= 1 && saved <= 10 ? saved : 1;
+  startLevelSelect.value = String(selectedStartLevel);
+}
+
+startLevelSelect.addEventListener('change', () => {
+  selectedStartLevel = parseInt(startLevelSelect.value, 10);
+  localStorage.setItem('startLevel', String(selectedStartLevel));
 });
 
 function createBoard() {
@@ -501,14 +521,19 @@ function togglePause() {
   if (gameOver) return;
   paused = !paused;
   if (!paused) {
+    pauseOverlay.classList.add('hidden');
     lastTime = performance.now();
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
-    overlayTitle.textContent = 'PAUSA';
-    overlayScore.textContent = '';
-    overlay.classList.remove('hidden');
+    showPauseMainView();
+    pauseOverlay.classList.remove('hidden');
   }
+}
+
+function showPauseMainView() {
+  pauseMain.classList.remove('hidden');
+  pauseControls.classList.add('hidden');
 }
 
 function loop(ts) {
@@ -532,10 +557,10 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  level = selectedStartLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = Math.max(100, 1000 - (level - 1) * 90);
   dropAccum = 0;
   rayoFlash = null;
   rayoProgress = 0;
@@ -546,12 +571,13 @@ function init() {
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  pauseOverlay.classList.add('hidden');
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
@@ -577,8 +603,23 @@ document.addEventListener('keydown', e => {
 
 restartBtn.addEventListener('click', init);
 
+resumeBtn.addEventListener('click', togglePause);
+
+restartPauseBtn.addEventListener('click', () => {
+  init();
+  pauseOverlay.classList.add('hidden');
+});
+
+controlsBtn.addEventListener('click', () => {
+  pauseMain.classList.add('hidden');
+  pauseControls.classList.remove('hidden');
+});
+
+backToPauseBtn.addEventListener('click', showPauseMainView);
+
 initTheme();
 initSkin();
+initStartLevel();
 init();
 
 // ---- Pantalla de inicio ----
