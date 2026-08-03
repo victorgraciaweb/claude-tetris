@@ -226,3 +226,49 @@ kbd {
 #restart-btn:hover {
   background: var(--btn-hover-bg);
 }
+
+/* ---- Skin selector ---- */
+#skin-select {
+  background: var(--kbd-bg);
+  color: var(--kbd-color);
+  border: 1px solid var(--kbd-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#skin-select:hover {
+  border-color: var(--value-color);
+}
+
+#skin-select:focus {
+  outline: none;
+  border-color: var(--value-color);
+}
+
+/* ---- Skins de tablero ---- */
+body.skin-neon #board,
+body.skin-neon #next-canvas {
+  background: #000;
+  border-color: #0ff;
+  box-shadow: 0 0 20px #0ff, 0 0 40px rgba(0, 255, 255, 0.3);
+}
+
+body.skin-pastel #board,
+body.skin-pastel #next-canvas {
+  background: #fdfaff;
+  border-color: #e0c8f0;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(224, 200, 240, 0.5);
+}
+
+body.skin-pixel #board,
+body.skin-pixel #next-canvas {
+  border-color: #888;
+  border-radius: 0;
+  box-shadow: none;
+  image-rendering: pixelated;
+}
